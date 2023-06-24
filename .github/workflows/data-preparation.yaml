@@ -1,4 +1,4 @@
-name: Data Pre-Processing Workflow
+name: Data Preparation Workflow
 
 on:
   schedule: 
