@@ -30,3 +30,7 @@ def main():
     search_embedding = get_search_embedding(search_query)
     results = get_similarities(search_embedding, df)
     print(results)
+
+
+if __name__ == "__main__": 
+    main()
