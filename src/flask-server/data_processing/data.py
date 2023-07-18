@@ -2,8 +2,10 @@ import requests
 import json
 import csv
 
+
 CURRENT_TERM = "202308"
 DATA_LINK = f"https://raw.githubusercontent.com/gt-scheduler/crawler-v2/gh-pages/{CURRENT_TERM}.json"
+
 
 def safe_access(func):
     try:

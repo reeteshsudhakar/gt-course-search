@@ -6,7 +6,7 @@ import openai
 from openai.embeddings_utils import get_embedding
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-DATA_PATH = "src/data_processing/full_data.csv"
+DATA_PATH = "data_processing/full_data.csv"
 
 def retrieve_data(): 
     df = pd.read_csv(DATA_PATH)
@@ -24,13 +24,13 @@ def get_similarities(search_embedding, df):
     df.sort_values(by="Similarities", ascending=False, inplace=True)
     return df.head(15)
 
-def main(): 
-    search_query = input("Enter a search query: ")
-    df = retrieve_data()
-    search_embedding = get_search_embedding(search_query)
-    results = get_similarities(search_embedding, df)
-    print(results)
+# def main(): 
+#     search_query = input("Enter a search query: ")
+#     df = retrieve_data()
+#     search_embedding = get_search_embedding(search_query)
+#     results = get_similarities(search_embedding, df)
+#     print(results)
 
 
-if __name__ == "__main__": 
-    main()
+# if __name__ == "__main__": 
+#     main()
