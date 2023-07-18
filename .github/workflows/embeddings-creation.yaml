@@ -1,8 +1,8 @@
-name: Data Preparation Workflow
+name: Embeddings Creation Workflow
 
 on:
     schedule:
-        - cron: "0 0 1 * *"
+        - cron: "30 0 1 * *"
     workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
                   pip install -r $GITHUB_WORKSPACE/requirements.txt
 
             - name: Run Python script
-              run: python $GITHUB_WORKSPACE/src/flask-server/data_processing/data.py
+              run: python $GITHUB_WORKSPACE/src/flask-server/data_processing/embeddings.py
 
             - name: Commit and push changes
               uses: stefanzweifel/git-auto-commit-action@v4
