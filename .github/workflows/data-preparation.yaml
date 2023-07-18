@@ -24,7 +24,7 @@ jobs:
           pip install -r $GITHUB_WORKSPACE/requirements.txt
 
       - name: Run Python script
-        run: python $GITHUB_WORKSPACE/src/data_processing/data.py  
+        run: python $GITHUB_WORKSPACE/src/flask-server/data_processing/data.py
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
