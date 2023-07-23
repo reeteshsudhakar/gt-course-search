@@ -5,7 +5,27 @@ from search.search_functions import (
 )
 
 import streamlit as st
+from enum import Enum 
 
+class CreditHours(Enum): 
+    ONE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+
+class Level(Enum): 
+    UNDERGRADUATE = "Undergraduate"
+    GRADUATE = "Graduate"
+
+
+class Days(Enum): 
+    MONDAY = "Monday"
+    TUESDAY = "Tuesday"
+    WEDNESDAY = "Wednesday"
+    THURSDAY = "Thursday"
+    FRIDAY = "Friday"
+
+    
 TITLE = '''
 <h1 style='text-align: center;'>
     <a style='text-decoration: none; color: #B3A369;'>
@@ -71,9 +91,43 @@ def main():
         num_results = st.slider(label="Number of results to display", min_value=5, max_value=15, value=10, step=1)
 
         # TODO: write code to filter by credit hours, department, level, and days
-        # credit_hours, department, level, days = st.columns(4)
+        credit_hours, level, days = st.columns(3)
+        credit_hour_selections = {
+            CreditHours.ONE: False,
+            CreditHours.TWO: False, 
+            CreditHours.THREE: False, 
+            CreditHours.FOUR: False, 
+        }
 
+        level_selections = {
+            Level.UNDERGRADUATE: False, 
+            Level.GRADUATE: False, 
+        }
 
+        day_selections = {
+            Days.MONDAY: False, 
+            Days.TUESDAY: False, 
+            Days.WEDNESDAY: False, 
+            Days.THURSDAY: False, 
+            Days.FRIDAY: False, 
+        }
+
+        credit_hours.write("Credit Hours")
+        credit_hour_selections[CreditHours.ONE] = credit_hours.checkbox(label="1 Hour", value=credit_hour_selections[CreditHours.ONE])
+        credit_hour_selections[CreditHours.TWO] = credit_hours.checkbox(label="2 Hours", value=credit_hour_selections[CreditHours.TWO])
+        credit_hour_selections[CreditHours.THREE] = credit_hours.checkbox(label="3 Hours", value=credit_hour_selections[CreditHours.THREE])
+        credit_hour_selections[CreditHours.FOUR] = credit_hours.checkbox(label="4 Hours", value=credit_hour_selections[CreditHours.FOUR])
+
+        level.write("Level")
+        level_selections[Level.UNDERGRADUATE] = level.checkbox(label="Undergraduate", value=level_selections[Level.UNDERGRADUATE])
+        level_selections[Level.GRADUATE] = level.checkbox(label="Graduate", value=level_selections[Level.GRADUATE])
+
+        days.write("Days")
+        day_selections[Days.MONDAY] = days.checkbox(label="Monday", value=day_selections[Days.MONDAY])
+        day_selections[Days.TUESDAY] = days.checkbox(label="Tuesday", value=day_selections[Days.TUESDAY])
+        day_selections[Days.WEDNESDAY] = days.checkbox(label="Wednesday", value=day_selections[Days.WEDNESDAY])
+        day_selections[Days.THURSDAY] = days.checkbox(label="Thursday", value=day_selections[Days.THURSDAY])
+        day_selections[Days.FRIDAY] = days.checkbox(label="Friday", value=day_selections[Days.FRIDAY])
 
     search_query = st.text_input("Search for a course:", placeholder="Games 🕹️ and technology  🖥️  ...", key='search_input')
 
