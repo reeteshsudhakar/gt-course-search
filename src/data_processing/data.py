@@ -22,7 +22,19 @@ def process_data():
     del data["version"]
 
     courses = data["courses"]
-    fields = ["Course ID", "Course Name", "Section Letters", "CRNs", "Days Met", "Locations", "Professors", "Course Description", "Full Text"]
+    fields = [
+        "Course ID", 
+        "Level",
+        "Course Name", 
+        "Credit Hours",
+        "Section Letters", 
+        "CRNs", 
+        "Days Met", 
+        "Locations", 
+        "Professors", 
+        "Course Description", 
+        "Full Text"
+    ]
 
     with open("courses.csv", "w") as f:
         writer = csv.writer(f)
@@ -40,16 +52,25 @@ def process_data():
             
             sections_info_to_string = {key: ";".join(value) for key, value in sections_info.items()}
 
-            data_to_write = [course_id, 
-                            course_data[0], 
-                            sections_info_to_string["section_letters"], 
-                            sections_info_to_string["crns"], 
-                            sections_info_to_string["days_met_list"], 
-                            sections_info_to_string["locations"], 
-                            sections_info_to_string["professors"], 
-                            course_data[3], 
-                            course_data[0] + " " + course_data[3]
-                            ]
+            course_name = course_data[0]
+            course_level = "Undergraduate" if int(course_id.split(" ")[1]) < 5000 else "Graduate"
+            credit_hours = course_data[1].values()[2]
+            course_description = course_data[3]
+            full_text = " ".join([course_id, course_name, course_description])
+
+            data_to_write = [
+                course_id,
+                course_level,
+                course_name,
+                credit_hours,
+                sections_info_to_string.get("section_letters", ""),
+                sections_info_to_string.get("crns", ""),
+                sections_info_to_string.get("days_met_list", ""),
+                sections_info_to_string.get("locations", ""),
+                sections_info_to_string.get("professors", ""),
+                course_description,
+                full_text,
+            ]
             
             writer.writerow(data_to_write)
 

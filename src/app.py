@@ -1,3 +1,8 @@
+'''
+TODO: add support for credit hours, days met for filtering
+TODO: add support for displaying sections, professors, dates, times, and locations in a table
+'''
+
 from search.search_functions import (
     retrieve_data,
     get_search_embedding,
@@ -19,11 +24,11 @@ class Level(Enum):
 
 
 class Days(Enum): 
-    MONDAY = "Monday"
-    TUESDAY = "Tuesday"
-    WEDNESDAY = "Wednesday"
-    THURSDAY = "Thursday"
-    FRIDAY = "Friday"
+    MONDAY = "M"
+    TUESDAY = "T"
+    WEDNESDAY = "W"
+    THURSDAY = "R"
+    FRIDAY = "F"
 
     
 TITLE = '''
@@ -90,7 +95,6 @@ def main():
 
         num_results = st.slider(label="Number of results to display", min_value=5, max_value=15, value=10, step=1)
 
-        # TODO: write code to filter by credit hours, department, level, and days
         credit_hours, level, days = st.columns(3)
         credit_hour_selections = {
             CreditHours.ONE: False,
@@ -122,17 +126,27 @@ def main():
         level_selections[Level.UNDERGRADUATE] = level.checkbox(label="Undergraduate", value=level_selections[Level.UNDERGRADUATE])
         level_selections[Level.GRADUATE] = level.checkbox(label="Graduate", value=level_selections[Level.GRADUATE])
 
-        days.write("Days")
-        day_selections[Days.MONDAY] = days.checkbox(label="Monday", value=day_selections[Days.MONDAY])
-        day_selections[Days.TUESDAY] = days.checkbox(label="Tuesday", value=day_selections[Days.TUESDAY])
-        day_selections[Days.WEDNESDAY] = days.checkbox(label="Wednesday", value=day_selections[Days.WEDNESDAY])
-        day_selections[Days.THURSDAY] = days.checkbox(label="Thursday", value=day_selections[Days.THURSDAY])
-        day_selections[Days.FRIDAY] = days.checkbox(label="Friday", value=day_selections[Days.FRIDAY])
+        # days.write("Days")
+        # day_selections[Days.MONDAY] = days.checkbox(label="Monday", value=day_selections[Days.MONDAY])
+        # day_selections[Days.TUESDAY] = days.checkbox(label="Tuesday", value=day_selections[Days.TUESDAY])
+        # day_selections[Days.WEDNESDAY] = days.checkbox(label="Wednesday", value=day_selections[Days.WEDNESDAY])
+        # day_selections[Days.THURSDAY] = days.checkbox(label="Thursday", value=day_selections[Days.THURSDAY])
+        # day_selections[Days.FRIDAY] = days.checkbox(label="Friday", value=day_selections[Days.FRIDAY])
 
     search_query = st.text_input("Search for a course:", placeholder="Games 🕹️ and technology  🖥️  ...", key='search_input')
 
     if search_query: 
         df = retrieve_data()
+
+        if any(credit_hour_selections.values()) and not all(credit_hour_selections.values()):
+            df = df[df["Credit Hours"].isin([k.value for k, v in credit_hour_selections.items() if v])]
+        
+        if any(level_selections.values()) and not all(level_selections.values()):
+            df = df[df["Level"].isin([k.value for k, v in level_selections.items() if v])]
+        
+        # if any(day_selections.values()) and not all(day_selections.values()):
+        #     df = df[df["Days Met"].isin([k.value for k, v in day_selections.items() if v])]
+
         search_embedding = get_search_embedding(search_query)
         results = get_similarities(search_embedding, df)
 
