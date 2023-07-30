@@ -54,7 +54,7 @@ def process_data():
 
             course_name = course_data[0]
             course_level = "Undergraduate" if int(course_id.split(" ")[1]) < 5000 else "Graduate"
-            credit_hours = list(course_data[1].values())[2]
+            credit_hours = list(course_data[1].values())[0][2]
             course_description = course_data[3]
             full_text = " ".join([course_id, course_name, course_description])
 
