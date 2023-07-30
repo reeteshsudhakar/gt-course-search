@@ -36,7 +36,7 @@ def process_data():
         "Full Text"
     ]
 
-    with open("courses.csv", "w") as f:
+    with open("src/data_processing/courses.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(fields)
 
@@ -53,7 +53,7 @@ def process_data():
             sections_info_to_string = {key: ";".join(value) for key, value in sections_info.items()}
 
             course_name = course_data[0]
-            course_level = "Undergraduate" if int(course_id.split(" ")[1]) < 5000 else "Graduate"
+            course_level = "Undergraduate" if int(course_id.split(" ")[1][:4]) < 5000 else "Graduate"
             credit_hours = list(course_data[1].values())[0][2]
             course_description = course_data[3]
             full_text = " ".join([course_id, course_name, course_description])
