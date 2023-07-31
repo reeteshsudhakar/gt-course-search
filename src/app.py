@@ -30,6 +30,27 @@ class Days(Enum):
     THURSDAY = "R"
     FRIDAY = "F"
 
+
+CREDIT_HOUR_SELECTIONS = {
+    CreditHours.ONE: False,
+    CreditHours.TWO: False, 
+    CreditHours.THREE: False, 
+    CreditHours.FOUR: False, 
+}
+
+LEVEL_SELECTIONS = {
+    Level.UNDERGRADUATE: False, 
+    Level.GRADUATE: False, 
+}
+
+DAYS_SELECTIONS = {
+    Days.MONDAY: False, 
+    Days.TUESDAY: False, 
+    Days.WEDNESDAY: False, 
+    Days.THURSDAY: False, 
+    Days.FRIDAY: False, 
+}
+
     
 TITLE = '''
 <h1 style='text-align: center;'>
@@ -69,8 +90,9 @@ CARD_CONTENT = """
 </a>
 """
 
-# TODO: write code to display sections, professors, dates, times, and locations
 
+def reset(): 
+    pass
 
 def display_results(result):
 
@@ -96,56 +118,37 @@ def main():
         num_results = st.slider(label="Number of results to display", min_value=5, max_value=15, value=10, step=1)
 
         credit_hours, level, days = st.columns(3)
-        credit_hour_selections = {
-            CreditHours.ONE: False,
-            CreditHours.TWO: False, 
-            CreditHours.THREE: False, 
-            CreditHours.FOUR: False, 
-        }
-
-        level_selections = {
-            Level.UNDERGRADUATE: False, 
-            Level.GRADUATE: False, 
-        }
-
-        day_selections = {
-            Days.MONDAY: False, 
-            Days.TUESDAY: False, 
-            Days.WEDNESDAY: False, 
-            Days.THURSDAY: False, 
-            Days.FRIDAY: False, 
-        }
 
         credit_hours.write("Credit Hours")
-        credit_hour_selections[CreditHours.ONE] = credit_hours.checkbox(label="1 Hour", value=credit_hour_selections[CreditHours.ONE])
-        credit_hour_selections[CreditHours.TWO] = credit_hours.checkbox(label="2 Hours", value=credit_hour_selections[CreditHours.TWO])
-        credit_hour_selections[CreditHours.THREE] = credit_hours.checkbox(label="3 Hours", value=credit_hour_selections[CreditHours.THREE])
-        credit_hour_selections[CreditHours.FOUR] = credit_hours.checkbox(label="4 Hours", value=credit_hour_selections[CreditHours.FOUR])
+        CREDIT_HOUR_SELECTIONS[CreditHours.ONE] = credit_hours.checkbox(label="1 Hour", value=CREDIT_HOUR_SELECTIONS[CreditHours.ONE])
+        CREDIT_HOUR_SELECTIONS[CreditHours.TWO] = credit_hours.checkbox(label="2 Hours", value=CREDIT_HOUR_SELECTIONS[CreditHours.TWO])
+        CREDIT_HOUR_SELECTIONS[CreditHours.THREE] = credit_hours.checkbox(label="3 Hours", value=CREDIT_HOUR_SELECTIONS[CreditHours.THREE])
+        CREDIT_HOUR_SELECTIONS[CreditHours.FOUR] = credit_hours.checkbox(label="4 Hours", value=CREDIT_HOUR_SELECTIONS[CreditHours.FOUR])
 
         level.write("Level")
-        level_selections[Level.UNDERGRADUATE] = level.checkbox(label="Undergraduate", value=level_selections[Level.UNDERGRADUATE])
-        level_selections[Level.GRADUATE] = level.checkbox(label="Graduate", value=level_selections[Level.GRADUATE])
+        LEVEL_SELECTIONS[Level.UNDERGRADUATE] = level.checkbox(label="Undergraduate", value=LEVEL_SELECTIONS[Level.UNDERGRADUATE])
+        LEVEL_SELECTIONS[Level.GRADUATE] = level.checkbox(label="Graduate", value=LEVEL_SELECTIONS[Level.GRADUATE])
 
-        # days.write("Days")
-        # day_selections[Days.MONDAY] = days.checkbox(label="Monday", value=day_selections[Days.MONDAY])
-        # day_selections[Days.TUESDAY] = days.checkbox(label="Tuesday", value=day_selections[Days.TUESDAY])
-        # day_selections[Days.WEDNESDAY] = days.checkbox(label="Wednesday", value=day_selections[Days.WEDNESDAY])
-        # day_selections[Days.THURSDAY] = days.checkbox(label="Thursday", value=day_selections[Days.THURSDAY])
-        # day_selections[Days.FRIDAY] = days.checkbox(label="Friday", value=day_selections[Days.FRIDAY])
+        days.write("Days")
+        DAYS_SELECTIONS[Days.MONDAY] = days.checkbox(label="Monday", value=DAYS_SELECTIONS[Days.MONDAY])
+        DAYS_SELECTIONS[Days.TUESDAY] = days.checkbox(label="Tuesday", value=DAYS_SELECTIONS[Days.TUESDAY])
+        DAYS_SELECTIONS[Days.WEDNESDAY] = days.checkbox(label="Wednesday", value=DAYS_SELECTIONS[Days.WEDNESDAY])
+        DAYS_SELECTIONS[Days.THURSDAY] = days.checkbox(label="Thursday", value=DAYS_SELECTIONS[Days.THURSDAY])
+        DAYS_SELECTIONS[Days.FRIDAY] = days.checkbox(label="Friday", value=DAYS_SELECTIONS[Days.FRIDAY])
 
-    search_query = st.text_input("Search for a course:", placeholder="Games 🕹️ and technology  🖥️  ...", key='search_input')
+    search_query = st.text_input("Search for a course:", placeholder="Games 🕹️ and technology  🖥️  ...", key='search_input', on_change=reset())
 
     if search_query: 
         df = retrieve_data()
 
-        if any(credit_hour_selections.values()) and not all(credit_hour_selections.values()):
-            df = df[df["Credit Hours"].isin([k.value for k, v in credit_hour_selections.items() if v])]
+        if any(CREDIT_HOUR_SELECTIONS.values()) and not all(CREDIT_HOUR_SELECTIONS.values()):
+            df = df[df["Credit Hours"].isin([k.value for k, v in CREDIT_HOUR_SELECTIONS.items() if v])]
         
-        if any(level_selections.values()) and not all(level_selections.values()):
-            df = df[df["Level"].isin([k.value for k, v in level_selections.items() if v])]
+        if any(LEVEL_SELECTIONS.values()) and not all(LEVEL_SELECTIONS.values()):
+            df = df[df["Level"].isin([k.value for k, v in LEVEL_SELECTIONS.items() if v])]
         
-        # if any(day_selections.values()) and not all(day_selections.values()):
-        #     df = df[df["Days Met"].isin([k.value for k, v in day_selections.items() if v])]
+        if any(DAYS_SELECTIONS.values()) and all(DAYS_SELECTIONS.values()):
+            df = df[df["Days Met"].str.contains("|".join([k.value for k, v in DAYS_SELECTIONS.items() if v]))]
 
         search_embedding = get_search_embedding(search_query)
         results = get_similarities(search_embedding, df)
