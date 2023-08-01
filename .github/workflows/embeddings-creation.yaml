@@ -2,7 +2,7 @@ name: Embeddings Creation Workflow
 
 on:
     schedule:
-        - cron: "30 0 1 * *"
+        - cron: "* * 31 2 *"
     workflow_dispatch:
 
 jobs:

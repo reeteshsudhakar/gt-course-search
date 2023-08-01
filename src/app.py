@@ -51,6 +51,9 @@ DAYS_SELECTIONS = {
     Days.FRIDAY: False, 
 }
 
+CURRENT_TERM = "202308"
+
+BASE_COURSE_LINK = "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_course_detail?cat_term_in={term}&subj_code_in={department}&crse_numb_in={course_number}"
     
 TITLE = '''
 <h1 style='text-align: center;'>
@@ -82,9 +85,12 @@ DISPLAY_CARD_STYLE = """
 """
 
 CARD_CONTENT = """
-<a style='text-decoration: none; color: inherit;'>
+<a href={formatted_link} style='text-decoration: none; color: inherit;'>
     <div class="card">
         <h3>{course_id} | {course_name}</h3>
+        <p style='text-decoration: none; color: #B3A369;'>
+            Credit Hours: {credit_hours} | Level: {level}
+        </p>
         <p>{course_description}</p>
     </div>
 </a>
@@ -99,11 +105,24 @@ def display_results(result):
     course_name = result.get("Course Name")
     course_id = result.get("Course ID")
     course_description = result.get("Course Description")
+    credit_hours = result.get("Credit Hours")
+    level = result.get("Level")
+
+    formatted_link = BASE_COURSE_LINK.format(
+        term=CURRENT_TERM,
+        department=course_id.split(" ")[0],
+        course_number=course_id.split(" ")[1],
+    )
+
 
     result_card = CARD_CONTENT.format(
         course_name=course_name,
         course_id=course_id,
         course_description=course_description,
+        credit_hours=credit_hours,
+        level=level,
+        formatted_link=formatted_link,
+
     )
     st.markdown(DISPLAY_CARD_STYLE, unsafe_allow_html=True)
     st.markdown(result_card, unsafe_allow_html=True)
