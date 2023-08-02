@@ -1,16 +1,11 @@
-'''
-TODO: add support for credit hours, days met for filtering
-TODO: add support for displaying sections, professors, dates, times, and locations in a table
-'''
-
 from search.search_functions import (
     retrieve_data,
     get_search_embedding,
     get_similarities,
 )
 
+from enum import Enum
 import streamlit as st
-from enum import Enum 
 
 class CreditHours(Enum): 
     ONE = 1
@@ -54,7 +49,9 @@ DAYS_SELECTIONS = {
 CURRENT_TERM = "202308"
 
 BASE_COURSE_LINK = "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_course_detail?cat_term_in={term}&subj_code_in={department}&crse_numb_in={course_number}"
-    
+CRN_SPECIFIC_LINK = "https://oscar.gatech.edu/bprod/bwckschd.p_disp_detail_sched?term_in={term}&crn_in={crn}"
+RMP_LINK = "https://www.ratemyprofessors.com/search/professors/361?q={professor}"
+
 TITLE = '''
 <h1 style='text-align: center;'>
     <a style='text-decoration: none; color: #B3A369;'>
@@ -65,6 +62,7 @@ TITLE = '''
     </a>
 </h1>
 '''
+
 SUBHEADING = '''
 <p style='text-decoration: none; color: inherit; text-align: center; color: #E5E5E5'>
     Find your next course at Georgia Tech using an OpenAI powered search model! 🤖
@@ -74,12 +72,18 @@ SUBHEADING = '''
 DISPLAY_CARD_STYLE = """
 <style>
     .card {
-        background-color: #222222;
-        border: 1px solid #ccc;
+        background-color: #343A40;
+        border: 1px solid #FFFFFF;
         border-radius: 4px;
         box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
         padding: 15px;
         margin-bottom: 15px;
+    }
+    
+    .course-table {
+        border-collapse: collapse;
+        width: 100%;
+        padding: 15px;
     }
 </style>
 """
@@ -92,6 +96,9 @@ CARD_CONTENT = """
             Credit Hours: {credit_hours} | Level: {level}
         </p>
         <p>{course_description}</p>
+        <table class="course-table">
+            {table_content}
+        </table>
     </div>
 </a>
 """
@@ -105,7 +112,7 @@ def display_results(result):
     course_name = result.get("Course Name")
     course_id = result.get("Course ID")
     course_description = result.get("Course Description")
-    credit_hours = result.get("Credit Hours")
+    credit_hours = str(int(result.get("Credit Hours")))
     level = result.get("Level")
 
     formatted_link = BASE_COURSE_LINK.format(
@@ -114,6 +121,32 @@ def display_results(result):
         course_number=course_id.split(" ")[1],
     )
 
+    table_content = "<tr><th>Section</th><th>Professor</th><th>Days</th><th>CRN</th></tr>"
+    section_letters = []
+    crns = []
+    days_met = []
+    locations = []
+    professors = []
+    
+
+    for section_letter in result.get("Section Letters").split(";"):
+        section_letters.append(section_letter)
+    for crn in result.get("CRNs").split(";"):
+        crns.append(crn)
+    for location in result.get("Locations").split(";"):
+        locations.append(location)
+    for professor in result.get("Professors").split(";"):
+        professors.append(professor)
+    
+    try:
+        for days in result.get("Days Met").split(";"):
+            days_met.append(days)
+    except:
+        days_met = [""] * len(section_letters)
+    
+    for i in range(min(len(section_letters), len(crns), len(days_met), len(locations), len(professors))):
+        table_content += f"<tr><td>{section_letters[i]}</td><td><a href={RMP_LINK.format(professor='+'.join(professors[i].split(' ')[:2]))}>{professors[i]}</td><td>{days_met[i]}</td><td><a href={CRN_SPECIFIC_LINK.format(term=CURRENT_TERM, crn=crns[i])}>{crns[i]}</td></tr>"
+    
 
     result_card = CARD_CONTENT.format(
         course_name=course_name,
@@ -122,12 +155,14 @@ def display_results(result):
         credit_hours=credit_hours,
         level=level,
         formatted_link=formatted_link,
-
+        table_content=table_content,
     )
+
     st.markdown(DISPLAY_CARD_STYLE, unsafe_allow_html=True)
     st.markdown(result_card, unsafe_allow_html=True)
 
 def main(): 
+    df = retrieve_data()    
     st.markdown(TITLE, unsafe_allow_html=True)
     st.markdown(SUBHEADING, unsafe_allow_html=True)
 
@@ -158,7 +193,6 @@ def main():
     search_query = st.text_input("Search for a course:", placeholder="Games 🕹️ and technology  🖥️  ...", key='search_input', on_change=reset())
 
     if search_query: 
-        df = retrieve_data()
 
         if any(CREDIT_HOUR_SELECTIONS.values()) and not all(CREDIT_HOUR_SELECTIONS.values()):
             df = df[df["Credit Hours"].isin([k.value for k, v in CREDIT_HOUR_SELECTIONS.items() if v])]
