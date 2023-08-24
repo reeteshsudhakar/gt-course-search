@@ -6,6 +6,7 @@ from search.search_functions import (
 
 from enum import Enum
 import streamlit as st
+import pandas as pd
 
 class CreditHours(Enum): 
     ONE = 1
@@ -158,13 +159,12 @@ def display_results(result):
         table_content=table_content,
     )
 
-    st.markdown(DISPLAY_CARD_STYLE, unsafe_allow_html=True)
-    st.markdown(result_card, unsafe_allow_html=True)
+    st.write(DISPLAY_CARD_STYLE, unsafe_allow_html=True)
+    st.write(result_card, unsafe_allow_html=True)
 
-def main(): 
-    df = retrieve_data()    
-    st.markdown(TITLE, unsafe_allow_html=True)
-    st.markdown(SUBHEADING, unsafe_allow_html=True)
+def main(df: pd.DataFrame):
+    st.write(TITLE, unsafe_allow_html=True)
+    st.write(SUBHEADING, unsafe_allow_html=True)
 
     with st.expander("Advanced Options"):
         st.write("Work in Progress 🚧")
@@ -211,4 +211,5 @@ def main():
 
 
 if __name__ == "__main__": 
-    main()
+    df = retrieve_data()
+    main(df=df)
