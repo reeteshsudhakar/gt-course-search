@@ -1,6 +1,6 @@
 from search.search_functions import (
     retrieve_data,
-    get_search_embedding,
+    get_embedding,
     get_similarities,
 )
 
@@ -203,7 +203,7 @@ def main(df: pd.DataFrame):
         if any(DAYS_SELECTIONS.values()) and all(DAYS_SELECTIONS.values()):
             df = df[df["Days Met"].str.contains("|".join([k.value for k, v in DAYS_SELECTIONS.items() if v]))]
 
-        search_embedding = get_search_embedding(search_query)
+        search_embedding = get_embedding(search_query)
         results = get_similarities(search_embedding, df)
 
         for i in range(min(num_results, results.shape[0])): 
